@@ -6,6 +6,10 @@ const omdbKey = keys.omdb.key;
 const axios = require("axios");
 const bandKey = keys.bandTown.key;
 const fs = require("fs");
+const moment = require("moment");
+moment().format();
+let now = moment().format("LLLL");
+
 
 switch (process.argv[2]) {
     case "spotify-this-song":
@@ -61,7 +65,7 @@ switch (process.argv[2]) {
 
 
 function runSpotify(song) {
-    fs.appendFile("./log.txt", "ran spotify-this-song: " + song +"; ", (err) => { if (err) throw err; console.log("log.txt updated") });
+    fs.appendFile("./log.txt", "ran spotify-this-song: " + song + " on " + now + "; ", (err) => { if (err) throw err; console.log("log.txt updated") });
     spotify.search({ type: 'track', query: song }, (err, data) => {
         if (err) throw err;
         let answer = data.tracks.items[0];
@@ -77,7 +81,7 @@ function runSpotify(song) {
 };
 
 function runOMDB(movie) {
-    fs.appendFile("./log.txt", "ran movie-this: " + movie +"; ", (err) => { if (err) throw err; console.log("log.txt updated") });
+    fs.appendFile("./log.txt", "ran movie-this: " + movie + " on " + now + "; ", (err) => { if (err) throw err; console.log("log.txt updated") });
     axios.get("http://www.omdbapi.com/?apikey=" + omdbKey + "&plot=short&t=" + movie).then((response) => {
         let info = response.data;
         console.log("-------------------------------");
@@ -102,17 +106,18 @@ function runOMDB(movie) {
 }
 
 function runBandsInTown(band) {
-    fs.appendFile("./log.txt", "ran concert-this: " + band +"; ", (err) => { if (err) throw err; console.log("log.txt updated") });
+    fs.appendFile("./log.txt", "ran concert-this: " + band + " on " + now + "; ", (err) => { if (err) throw err; console.log("log.txt updated") });
 
     axios.get("https://rest.bandsintown.com/artists/" + band + "/events?app_id=" + bandKey).then((response) => {
         let newArray = response.data.map((event) => {
             return { name: event.venue.name, place: event.venue.city + ", " + event.venue.country, date: event.datetime }
         })
         newArray.forEach((event) => {
-            console.log("----------------------------")
+            console.log("--------------------------------------------------")
             console.log("Name of Venue: " + event.name);
             console.log("Venue Location: " + event.place);
-            console.log("Date of Concert: " + event.date);
+            let show = moment(event.date).format("MM/DD/YYYY");
+            console.log("Date of Show: " + show)
         })
     }).catch((err) => { console.log(err) })
 };
