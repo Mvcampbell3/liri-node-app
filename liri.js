@@ -61,6 +61,7 @@ switch (process.argv[2]) {
 
 
 function runSpotify(song) {
+    fs.appendFile("./log.txt", "ran spotify-this-song: " + song +"; ", (err) => { if (err) throw err; console.log("log.txt updated") });
     spotify.search({ type: 'track', query: song }, (err, data) => {
         if (err) throw err;
         let answer = data.tracks.items[0];
@@ -76,6 +77,7 @@ function runSpotify(song) {
 };
 
 function runOMDB(movie) {
+    fs.appendFile("./log.txt", "ran movie-this: " + movie +"; ", (err) => { if (err) throw err; console.log("log.txt updated") });
     axios.get("http://www.omdbapi.com/?apikey=" + omdbKey + "&plot=short&t=" + movie).then((response) => {
         let info = response.data;
         console.log("-------------------------------");
@@ -100,6 +102,8 @@ function runOMDB(movie) {
 }
 
 function runBandsInTown(band) {
+    fs.appendFile("./log.txt", "ran concert-this: " + band +"; ", (err) => { if (err) throw err; console.log("log.txt updated") });
+
     axios.get("https://rest.bandsintown.com/artists/" + band + "/events?app_id=" + bandKey).then((response) => {
         let newArray = response.data.map((event) => {
             return { name: event.venue.name, place: event.venue.city + ", " + event.venue.country, date: event.datetime }
@@ -116,16 +120,26 @@ function runBandsInTown(band) {
 function runRandom() {
     fs.readFile('./random.txt', "utf8", (err, data) => {
         if (err) throw err;
-        // let randomArray = data.replace(/\r\n/g, ";").split(";");
-        // console.log(randomArray);
-        // let orderedArray = randomArray.map((line)=>{
-        //     return line.split(",");
-        // });
-        // console.log(orderedArray);
-        // let runArray = orderedArray.map((part)=>{
-        //     return {type: part[0], string: part[1]};
-        // });
-        // console.log(runArray);
-        console.log(data.split(";"));
+        let randomArray = data.split(";")
+            .map((going) => going.split(","))
+            .map((deep) => {
+                return { type: deep[0], string: deep[1] };
+            })
+        let num = Math.floor(Math.random() * randomArray.length);
+        console.log("Randomly picked <" + randomArray[num].type + "> with <" + randomArray[num].string + ">");
+        switch (randomArray[num].type) {
+            case "spotify-this-song":
+                runSpotify(randomArray[num].string);
+                break;
+            case "movie-this":
+                runOMDB(randomArray[num].string);
+                break;
+            case "concert-this":
+                runBandsInTown(randomArray[num].string);
+                break;
+            default:
+                console.log("do-what-it-says switch not working as expected");
+                runSpotify("Never Gonna Give You Up");
+        }
     });
 }
