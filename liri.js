@@ -10,7 +10,6 @@ const moment = require("moment");
 moment().format();
 let now = moment().format("LLLL");
 
-
 switch (process.argv[2]) {
     case "spotify-this-song":
         if (process.argv.length > 3) {
@@ -57,12 +56,6 @@ switch (process.argv[2]) {
     default:
         console.log("this is not working as expected");
 }
-
-
-
-
-// Functions for running the different process.argv[2]
-
 
 function runSpotify(song) {
     fs.appendFile("./log.txt", "ran spotify-this-song: " + song + " on " + now + "; ", (err) => { if (err) throw err; console.log("log.txt updated") });
