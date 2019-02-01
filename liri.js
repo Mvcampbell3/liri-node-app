@@ -4,6 +4,8 @@ const Spotify = require("node-spotify-api");
 const spotify = new Spotify(keys.spotify);
 const omdbKey = keys.omdb.key;
 const axios = require("axios");
+const bandKey = keys.bandTown.key;
+const fs = require("fs");
 
 switch (process.argv[2]) {
     case "spotify-this-song":
@@ -31,6 +33,22 @@ switch (process.argv[2]) {
             let nobody = "Mr. Nobody"
             runOMDB(nobody);
         }
+        break;
+    case "concert-this":
+        if (process.argv.length > 3) {
+            let bandName = [];
+            for (let i = 3; i < process.argv.length; i++) {
+                bandName.push(process.argv[i]);
+            }
+            bandName = bandName.join("+");
+            runBandsInTown(bandName);
+        } else {
+            let myBand = "Metallica"
+            runBandsInTown(myBand);
+        }
+        break;
+    case "do-what-it-says":
+        runRandom();
         break;
     default:
         console.log("this is not working as expected");
@@ -79,4 +97,35 @@ function runOMDB(movie) {
         console.log("Actors: " + info.Actors);
         console.log("-------------------------------");
     }).catch((err) => { console.log(err) });
+}
+
+function runBandsInTown(band) {
+    axios.get("https://rest.bandsintown.com/artists/" + band + "/events?app_id=" + bandKey).then((response) => {
+        let newArray = response.data.map((event) => {
+            return { name: event.venue.name, place: event.venue.city + ", " + event.venue.country, date: event.datetime }
+        })
+        newArray.forEach((event) => {
+            console.log("----------------------------")
+            console.log("Name of Venue: " + event.name);
+            console.log("Venue Location: " + event.place);
+            console.log("Date of Concert: " + event.date);
+        })
+    }).catch((err) => { console.log(err) })
+};
+
+function runRandom() {
+    fs.readFile('./random.txt', "utf8", (err, data) => {
+        if (err) throw err;
+        // let randomArray = data.replace(/\r\n/g, ";").split(";");
+        // console.log(randomArray);
+        // let orderedArray = randomArray.map((line)=>{
+        //     return line.split(",");
+        // });
+        // console.log(orderedArray);
+        // let runArray = orderedArray.map((part)=>{
+        //     return {type: part[0], string: part[1]};
+        // });
+        // console.log(runArray);
+        console.log(data.split(";"));
+    });
 }
