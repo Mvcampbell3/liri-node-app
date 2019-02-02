@@ -50,7 +50,7 @@ Congratulations! You are now ready to use the app!!
 
 <a name="use"></a>
 ## 3. Usage:
-Once again, open the liri-node-app folder in your command promt/git bash<br>
+Once again, open the liri-node-app folder in your command prompt/git bash<br>
 This is getting exciting now!<br>
 Every Liri call starts with
 ```
@@ -99,7 +99,7 @@ Will return:
 - The name of the song
 - The name of the artist who made the song
 - The name of the album the song was on
-- The spotify link to listen to the song (press crtl and click)
+- The spotify link to listen to the song (press ctrl and click)
 
 #### movie-this
 Will return:
@@ -116,12 +116,12 @@ Will return:
 Will return for each upcoming concert:
 - Name of the venue the concert is taking place
 - City and Country where the venue is located
-- Data of the concert
+- Date of the concert
 
 #### do-what-it-says
 Will Return:
 - a random item from the random.txt file.
-- There are several movies, songs, and bands mixed in to get informaiton on. Enjoy!
+- There are several movies, songs, and bands mixed in for liri to run. Enjoy!
 
 <a name="issue"></a>
 ## 4. Issues:
