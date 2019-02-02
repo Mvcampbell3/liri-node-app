@@ -58,7 +58,7 @@ switch (process.argv[2]) {
 }
 
 function runSpotify(song) {
-    fs.appendFile("./log.txt", "ran spotify-this-song: " + song + " on " + now + "; ", (err) => { if (err) throw err; console.log("log.txt updated") });
+    fs.appendFile("./log.txt", "ran spotify-this-song: " + song + " on " + now + "; ", (err) => { if (err) throw err});
     spotify.search({ type: 'track', query: song }, (err, data) => {
         if (err) throw err;
         let answer = data.tracks.items[0];
@@ -74,7 +74,7 @@ function runSpotify(song) {
 };
 
 function runOMDB(movie) {
-    fs.appendFile("./log.txt", "ran movie-this: " + movie + " on " + now + "; ", (err) => { if (err) throw err; console.log("log.txt updated") });
+    fs.appendFile("./log.txt", "ran movie-this: " + movie + " on " + now + "; ", (err) => { if (err) throw err});
     axios.get("http://www.omdbapi.com/?apikey=" + omdbKey + "&plot=short&t=" + movie).then((response) => {
         let info = response.data;
         console.log("-------------------------------");
@@ -99,7 +99,7 @@ function runOMDB(movie) {
 }
 
 function runBandsInTown(band) {
-    fs.appendFile("./log.txt", "ran concert-this: " + band + " on " + now + "; ", (err) => { if (err) throw err; console.log("log.txt updated") });
+    fs.appendFile("./log.txt", "ran concert-this: " + band + " on " + now + "; ", (err) => { if (err) throw err});
 
     axios.get("https://rest.bandsintown.com/artists/" + band + "/events?app_id=" + bandKey).then((response) => {
         let newArray = response.data.map((event) => {
