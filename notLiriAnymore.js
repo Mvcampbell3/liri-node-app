@@ -10,15 +10,16 @@ const moment = require("moment");
 moment().format();
 let now = moment().format("LLLL");
 
+let searchTerm = [];
+for (let i = 3; i < process.argv.length; i++) {
+    searchTerm.push(process.argv[i]);
+}
+
 switch (process.argv[2]) {
     case "spotify-this-song":
         if (process.argv.length > 3) {
-            let songTitle = [];
-            for (let i = 3; i < process.argv.length; i++) {
-                songTitle.push(process.argv[i]);
-            }
-            songTitle = songTitle.join(" ");
-            runSpotify(songTitle);
+            searchTerm = searchTerm.join(" ");
+            runSpotify(searchTerm);
         } else {
             let sign = "The Sign"
             runSpotify(sign);
@@ -26,12 +27,8 @@ switch (process.argv[2]) {
         break;
     case "movie-this":
         if (process.argv.length > 3) {
-            let movieTitle = [];
-            for (let i = 3; i < process.argv.length; i++) {
-                movieTitle.push(process.argv[i]);
-            }
-            movieTitle = movieTitle.join("+");
-            runOMDB(movieTitle);
+            searchTerm = searchTerm.join("+");
+            runOMDB(searchTerm);
         } else {
             let nobody = "Mr. Nobody"
             runOMDB(nobody);
@@ -39,12 +36,8 @@ switch (process.argv[2]) {
         break;
     case "concert-this":
         if (process.argv.length > 3) {
-            let bandName = [];
-            for (let i = 3; i < process.argv.length; i++) {
-                bandName.push(process.argv[i]);
-            }
-            bandName = bandName.join("+");
-            runBandsInTown(bandName);
+            search = search.join("+");
+            runBandsInTown(search);
         } else {
             let myBand = "Metallica"
             runBandsInTown(myBand);
@@ -54,11 +47,12 @@ switch (process.argv[2]) {
         runRandom();
         break;
     default:
-        console.log("this is not working as expected");
+        console.log("this is not working as expected, check spelling of your search method");
+        runSpotify("Never Gonna Give You Up")
 }
 
 function runSpotify(song) {
-    fs.appendFile("./log.txt", "ran spotify-this-song: " + song + " on " + now + "; ", (err) => { if (err) throw err});
+    fs.appendFile("./log.txt", "ran spotify-this-song: " + song + " on " + now + "; ", (err) => { if (err) throw err });
     spotify.search({ type: 'track', query: song }, (err, data) => {
         if (err) throw err;
         let answer = data.tracks.items[0];
@@ -74,7 +68,7 @@ function runSpotify(song) {
 };
 
 function runOMDB(movie) {
-    fs.appendFile("./log.txt", "ran movie-this: " + movie + " on " + now + "; ", (err) => { if (err) throw err});
+    fs.appendFile("./log.txt", "ran movie-this: " + movie + " on " + now + "; ", (err) => { if (err) throw err });
     axios.get("http://www.omdbapi.com/?apikey=" + omdbKey + "&plot=short&t=" + movie).then((response) => {
         let info = response.data;
         console.log("-------------------------------");
@@ -99,7 +93,7 @@ function runOMDB(movie) {
 }
 
 function runBandsInTown(band) {
-    fs.appendFile("./log.txt", "ran concert-this: " + band + " on " + now + "; ", (err) => { if (err) throw err});
+    fs.appendFile("./log.txt", "ran concert-this: " + band + " on " + now + "; ", (err) => { if (err) throw err });
 
     axios.get("https://rest.bandsintown.com/artists/" + band + "/events?app_id=" + bandKey).then((response) => {
         let newArray = response.data.map((event) => {
