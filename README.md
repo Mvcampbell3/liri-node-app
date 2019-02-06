@@ -102,7 +102,4 @@ The date of the event
 
 <a name="example"></a>
 ## 4. Examples:
-<video controls="controls">
-  <source type="video/webm" src="./images/liriDemo.webm"></source>
-  <p>Your browser does not support the video element.</p>
-</video>
+![alt text](./images/liriSongDemo.gif "Song Demo")
