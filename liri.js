@@ -22,7 +22,7 @@ inquirer.prompt(
             "Song Details",
             "Movie Facts",
             "Band/Artist Concert Information",
-            "You decide For Me"
+            "You Decide For Me"
         ]
     },
 ).then((answer) => {
@@ -34,7 +34,13 @@ inquirer.prompt(
                     name: "songName",
                     message: "Which song would you like to know more about?"
                 }
-            ).then((answer) => runSpotify(answer.songName));
+            ).then((answer) => {
+                if (answer.songName != "") {
+                    runSpotify(answer.songName);
+                } else {
+                    runSpotify("Danger Zone");
+                }
+            });
             break;
         case "Movie Facts":
             inquirer.prompt(
@@ -43,7 +49,13 @@ inquirer.prompt(
                     name: "movieName",
                     message: "Which movie would you like to know more about?"
                 }
-            ).then((answer) => runOMDB(answer.movieName));
+            ).then((answer) => {
+                if (answer.movieName != "") {
+                    runOMDB(answer.movieName)
+                } else {
+                    runOMDB("Mr. Nobody");
+                }
+            });
             break;
         case "Band/Artist Concert Information":
             inquirer.prompt(
@@ -52,9 +64,15 @@ inquirer.prompt(
                     name: "bandName",
                     message: "Which band/artist would you like to know about their upcoming shows?"
                 }
-            ).then((answer) => runBandsInTown(answer.bandName));
+            ).then((answer) => {
+                if (answer.bandName != "") {
+                    runBandsInTown(answer.bandName)
+                } else {
+                    runBandsInTown("Metallica")
+                }
+            });
             break;
-        case "You decide For Me":
+        case "You Decide For Me":
             console.log("I will decide for you");
             runRandom();
             break;
@@ -67,17 +85,33 @@ function runSpotify(song) {
     fs.appendFile("./log.txt", "ran spotify-this-song: " + song + " on " + now + "; ", (err) => { if (err) throw err });
     spotify.search({ type: 'track', query: song }, (err, data) => {
         if (err) throw err;
-        let answer = data.tracks.items[0];
-        let displaySong = new Table({
-            head: ["Song Detail", "Information"]
+        if (data.tracks.total == 0){
+            console.log("There was an error in your search, please check your spelling and try again".red);
+            return;
+        };
+        let answers = data.tracks.items;
+
+        if (answers.length > 5) {
+            answers = answers.slice(0, 5);
+        };
+
+        let songStructure = answers.map((song) => {
+            return { name: song.name, artist: song.artists[0].name, album: song.album.name, listen: song.external_urls.spotify }
         })
-        displaySong.push(
-            { "Song Title": answer.name },
-            { "Band/Artist": answer.artists[0].name },
-            { "Album Name": answer.album.name },
-            { "Listen": answer.external_urls.spotify }
-        );
-        console.log(displaySong.toString());
+
+        songStructure.forEach((song) => {
+            let displaySong = new Table({
+                head: ["Song Detail", "Information"]
+            });
+            displaySong.push(
+                { "Song Title": song.name },
+                { "Band/Artist": song.artist },
+                { "Album Name": song.album },
+                { "Listen": song.listen }
+            );
+            console.log(displaySong.toString());
+        });
+
     });
 };
 
@@ -97,42 +131,38 @@ function runOMDB(movie) {
         console.log("Actors: ".green + info.Actors.blue);
         console.log("-------------------------------".red);
 
-    }).catch((err) => { console.log(err) });
+    }).catch((err) => console.log("There was an error with your search, please check your spelling and try again".red));
 }
 
 function runBandsInTown(band) {
     fs.appendFile("./log.txt", "ran concert-this: " + band + " on " + now + "; ", (err) => { if (err) throw err });
 
     axios.get("https://rest.bandsintown.com/artists/" + band + "/events?app_id=" + bandKey).then((response) => {
-        let newArray = response.data.map((event) => {
-            return { name: event.venue.name, place: event.venue.city + ", " + event.venue.country, date: event.datetime }
-        })
-        console.log(newArray.length);
-
-        if (newArray.length > 15) {
-            newArray = newArray.slice(0, 15);
+        if (response.data != "") {
+            console.log("You searched for the artist " + band.green);
+            let newArray = response.data.map((event) => {
+                return { name: event.venue.name, place: event.venue.city + ", " + event.venue.country, date: event.datetime }
+            })
+            if (newArray.length > 15) {
+                newArray = newArray.slice(0, 15);
+            }
+            newArray.forEach((event) => {
+                let show = moment(event.date).format("MM/DD/YYYY");
+                let displayShow = new Table({
+                    head: ["Concert Detail", "Infortmation"]
+                })
+                displayShow.push(
+                    { "Name of Venue": event.name },
+                    { "Venue Location": event.place },
+                    { "Date of Show": show },
+                )
+                console.log(displayShow.toString());
+            })
+        } else {
+            console.log("There are no upcoming shows for that artist".blue)
         }
 
-        console.log(newArray.length);
-
-        
-        newArray.forEach((event) => {
-            // console.log("--------------------------------------------------")
-            // console.log("Name of Venue: " + event.name);
-            // console.log("Venue Location: " + event.place);
-            let show = moment(event.date).format("MM/DD/YYYY");
-            // console.log("Date of Show: " + show)
-            let displayShow = new Table({
-                head: ["Concert Detail", "Infortmation"]
-            })
-            displayShow.push(
-                {"Name of Venue": event.name},
-                {"Venue Location": event.place},
-                {"Date of Show": show},
-            )
-            console.log(displayShow.toString());
-        })
-    }).catch((err) => { console.log(err) })
+    }).catch((err) => { console.log("There was an error with your search, please check your spelling and try again.".red) })
 };
 
 function runRandom() {
