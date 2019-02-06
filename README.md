@@ -102,9 +102,7 @@ The date of the event
 
 <a name="example"></a>
 ## 4. Examples:
-[![Watch the video]("./images/liriDemo.webm)
 <video controls="controls">
-  <source type="video/mp4" src="filename.mp4"></source>
-  <source type="video/webm" src="filename.webm"></source>
+  <source type="video/webm" src="./images/liriDemo.webm"></source>
   <p>Your browser does not support the video element.</p>
 </video>
