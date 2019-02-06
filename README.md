@@ -102,4 +102,7 @@ The date of the event
 
 <a name="example"></a>
 ## 4. Examples:
+
+### Need to work on my gif-ability. This will be updated after some testing
+
 ![alt text](./images/liriSongDemo.gif "Song Demo")
